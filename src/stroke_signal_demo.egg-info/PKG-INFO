@@ -1,0 +1,13 @@
+Metadata-Version: 2.4
+Name: stroke-signal-demo
+Version: 0.1.0
+Summary: Reproducible stroke prediction classifier benchmark
+Requires-Python: >=3.10
+License-File: LICENSE
+Requires-Dist: pandas>=2.2
+Requires-Dist: scikit-learn>=1.5
+Requires-Dist: matplotlib>=3.9
+Provides-Extra: dev
+Requires-Dist: pytest>=8; extra == "dev"
+Requires-Dist: ruff>=0.6; extra == "dev"
+Dynamic: license-file

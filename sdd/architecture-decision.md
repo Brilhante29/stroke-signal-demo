@@ -2,68 +2,78 @@
 
 ## Status
 
-Proposed
+Accepted
 
 ## Context
 
-Project: `<project-name>`
-Claim: `<measurable claim>`
-Benchmark: `<primary metric>`
+Project: `4 - stroke-signal-demo`
+Claim: reproducao de classificador clinico
+Benchmark: accuracy, confusion_matrix
 
 Problem forces:
 
-- Domain complexity: `<low|medium|high>`
-- Integration pressure: `<low|medium|high>`
-- UI state complexity: `<low|medium|high|none>`
-- Data/ML reproducibility: `<low|medium|high>`
-- Auditability/event history: `<low|medium|high>`
-- Throughput/async pressure: `<low|medium|high>`
-- Independent deployability need: `<low|medium|high>`
+- Domain complexity: low
+- Integration pressure: low
+- UI state complexity: none
+- Data/ML reproducibility: high
+- Auditability/event history: medium
+- Throughput/async pressure: low
+- Independent deployability need: low
 
 ## Decision
 
-Chosen architecture: `<style>`
+Chosen architecture: `pipeline`
 
 Reason:
 
-`<Explain why this architecture fits the actual problem and benchmark.>`
+A three-stage pipeline (fixture generation -> model training/evaluation -> benchmark output) maps directly to the problem. Data flows in one direction with no branching, state machine, or event loop. The CLI wraps all three stages and provides `demo` and `benchmark` subcommands.
 
 Dependency rule:
 
-`<Example: domain/application do not depend on infra; adapters depend inward through ports.>`
+fixture depends only on numpy/pandas; model depends on scikit-learn and fixture output; benchmark orchestrates both; CLI depends on all three inward.
 
 ## Rejected Alternatives
 
 | Alternative | Why rejected |
 |---|---|
-| `<style>` | `<reason>` |
-| `<style>` | `<reason>` |
+| hexagonal | No infrastructure boundary worth isolating; no ports/adapters needed without cloud, database, or transport |
+| microservices | Single-process pipeline has no deploy boundary; splitting adds distributed cost without benefit |
 
 ## Folder Layout
 
-```txt
+```
 src/
-  <folders>
-test/
+  stroke_signal/
+    __init__.py
+    __main__.py
+    cli.py
+    domain.py
+    fixture.py
+    model.py
+    benchmark.py
+tests/
+  test_domain.py
+  test_model.py
 benchmarks/
+  results/
+    baseline.json
 ```
 
 ## Testing Strategy
 
-- Unit tests: `<what is isolated>`
-- Integration tests: `<what is wired>`
-- Benchmark: `<what proves the claim>`
+- Unit tests: domain types (BenchmarkResult construction and serialization)
+- Integration tests: model train/evaluate with synthetic data; deterministic repeatability
+- Benchmark: full pipeline via CLI or Docker, outputs JSON to benchmarks/results/
 
 ## Consequences
 
 Positive:
 
-- `<benefit>`
+- Simple three-stage pipeline is easy to understand and modify.
+- Deterministic synthetic data ensures reproducible benchmarks across environments.
+- No external dependencies for default path.
 
 Tradeoffs:
 
-- `<cost>`
-
-Migration path:
-
-- `<how to evolve if the problem grows>`
+- Synthetic data may not reflect real-world feature distributions; the claim is about classifier reproducibility, not clinical accuracy.
+- RandomForest with default params may overfit to synthetic distribution; benchmark transparency addresses this via seed and environment recording.

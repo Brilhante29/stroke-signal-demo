@@ -1,0 +1,2 @@
+[console_scripts]
+stroke-signal-demo = stroke_signal.cli:main

@@ -4,64 +4,64 @@ Project: `4 - stroke-signal-demo`
 
 ## Principal Agent Summary
 
-- Objective:
-- Portfolio program:
-- Public proof claim:
-- Primary benchmark:
-- Default runnable path:
+- Objective: Reproduzir classificador clinico de AVC com dados sinteticos deterministicos.
+- Portfolio program: mlops-data-platform
+- Public proof claim: reproducao de classificador clinico
+- Primary benchmark: accuracy
+- Default runnable path: `docker run --rm stroke-signal-demo`
 
 ## Subagent Decisions
 
 | Role | Decision | Evidence Path | Status |
 |---|---|---|---|
-| `program-planner` |  | `project.yaml`, `sdd/spec.md` | pending |
-| `architecture-selector` |  | `sdd/architecture-decision.md` | pending |
-| `engineering-principles-reviewer` |  | `project.yaml`, `sdd/technical-decision.md` | pending |
-| `stack-decision-agent` |  | `project.yaml`, `sdd/technical-decision.md` | pending |
-| `api-style-agent` |  | API or CLI contract | pending |
-| `cloud-local-first-agent` |  | Docker/Kumo/local adapter docs | pending |
-| `messaging-agent` |  | `sdd/technical-decision.md` | pending |
-| `language-profile-agent` |  | repo layout, tests, tooling | pending |
-| `benchmark-harness-agent` |  | `sdd/benchmark-plan.md`, `benchmarks/results/` | pending |
-| `design-system-agent` |  | `README.md`, diagrams | pending |
-| `security-reuse-reviewer` |  | `REFERENCES.md`, release checklist | pending |
-| `release-ci-publisher` |  | validation and CI | pending |
+| `program-planner` | mlops-data-platform | `project.yaml`, `sdd/spec.md` | done |
+| `architecture-selector` | pipeline | `sdd/architecture-decision.md` | done |
+| `engineering-principles-reviewer` | SOLID + KISS/YAGNI | `project.yaml`, `sdd/technical-decision.md` | done |
+| `stack-decision-agent` | python, scikit-learn, pandas | `project.yaml`, `sdd/technical-decision.md` | done |
+| `api-style-agent` | CLI (argparse) | CLI contract in README | done |
+| `cloud-local-first-agent` | none | Docker-only runtime | done |
+| `messaging-agent` | none | `sdd/technical-decision.md` | done |
+| `language-profile-agent` | python-ml | repo layout, tests, tooling | done |
+| `benchmark-harness-agent` | accuracy benchmark | `sdd/benchmark-plan.md`, `benchmarks/results/baseline.json` | done |
+| `design-system-agent` | README with benchmark table | `README.md` | done |
+| `security-reuse-reviewer` | no secrets, no network | `REFERENCES.md`, release checklist | done |
+| `release-ci-publisher` | validation and CI | CI workflow, validation | done |
 
 ## Local-First Runtime
 
-- Docker command:
-- Local services:
-- Kumo services, if any:
-- Real cloud adapter target, if any:
-- Config switch:
+- Docker command: `docker run --rm stroke-signal-demo`
+- Local services: none
+- Kumo services, if any: none
+- Real cloud adapter target, if any: none
+- Config switch: none
 - Default path requires paid secret: no
 
 ## Architecture Boundaries
 
-- Domain boundaries:
-- Use-case boundaries:
-- Ports:
-- Adapters:
-- Dependency direction rule:
+- Domain boundaries: stroke_signal/domain.py (pure dataclasses)
+- Use-case boundaries: fixture -> model -> benchmark
+- Ports: function signatures (generate_dataset, train_and_evaluate, run_benchmark)
+- Adapters: none (no infrastructure boundaries)
+- Dependency direction rule: CLI imports benchmark/model/fixture; benchmark imports model/fixture; model imports fixture
 
 ## Benchmark Handoff
 
-- Metric:
-- Unit:
-- Higher or lower is better:
-- Command:
-- Result path:
-- Dataset or fixture:
+- Metric: accuracy
+- Unit: unit (0-1 scale)
+- Higher or lower is better: higher
+- Command: `stroke-signal-demo benchmark --n-samples 5000 --seed 42 --output benchmarks/results/baseline.json`
+- Result path: `benchmarks/results/baseline.json`
+- Dataset or fixture: synthetic (src/stroke_signal/fixture.py)
 
 ## Open Risks
 
-- 
+- None
 
 ## Publication Gates
 
-- [ ] Docker path works
-- [ ] benchmark result exists
-- [ ] README starts with number, claim, and benchmark
-- [ ] references are documented
-- [ ] no secret in files or git remote
-- [ ] validation passes
+- [x] Docker path works
+- [x] benchmark result exists
+- [x] README starts with number, claim, and benchmark
+- [x] references are documented
+- [x] no secret in files or git remote
+- [x] validation passes

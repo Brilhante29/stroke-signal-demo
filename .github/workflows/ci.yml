@@ -1,0 +1,34 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v6
+      - name: Validate portfolio contract
+        shell: pwsh
+        run: ./tools/validate-project.ps1 -SkipDocker
+      - name: Build image
+        run: docker build --tag stroke-signal-demo:${{ github.sha }} .
+      - name: Run demo
+        run: docker run --rm stroke-signal-demo:${{ github.sha }} demo
+      - name: Run benchmark
+        run: |
+          mkdir -p benchmarks/results
+          docker run --rm \
+            -v "$PWD/benchmarks/results:/app/benchmarks/results" \
+            stroke-signal-demo:${{ github.sha }} \
+            benchmark --n-samples 5000 --seed 42 --output /app/benchmarks/results/ci.json
+      - uses: actions/upload-artifact@v7
+        with:
+          name: stroke-signal-demo-benchmark
+          path: benchmarks/results/ci.json
