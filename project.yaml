@@ -6,7 +6,7 @@ program:
   shared_assets:
     - reproducible benchmark JSON schema
     - synthetic medical fixture generator
-status: implemented
+status: benchmarked
 claim: reproducao de classificador clinico
 stack:
   - python

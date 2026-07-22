@@ -1,0 +1,37 @@
+{
+  "project": "4-stroke-signal-demo",
+  "metric": "accuracy",
+  "value": 0.987,
+  "unit": "unit",
+  "timestamp": "2026-07-20T19:31:26Z",
+  "command": "stroke-signal-demo benchmark --n-samples 5000 --seed 42 --output benchmarks\\results\\baseline.json",
+  "environment": {
+    "python_version": "3.10.11",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "seed": 42,
+    "n_samples": 5000,
+    "classifier": "random-forest",
+    "n_estimators": 100,
+    "test_split": 0.2,
+    "repeat": 1,
+    "elapsed_seconds": 0.2672,
+    "repeats": 1
+  },
+  "metrics": {
+    "accuracy": 0.987,
+    "precision": 0.8627450980392157,
+    "recall": 0.88,
+    "f1_score": 0.8712871287128713,
+    "tn": 943,
+    "fp": 7,
+    "fn": 6,
+    "tp": 44,
+    "elapsed_seconds": 0.2672
+  },
+  "proof": {
+    "fixture": "synthetic",
+    "fixture_generator": "stroke_signal.fixture.generate_dataset",
+    "classifier": "sklearn.ensemble.RandomForestClassifier"
+  },
+  "failures": 0
+}
