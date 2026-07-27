@@ -90,6 +90,10 @@ architecture:
       reason: There is no infrastructure or transport boundary to justify ports and adapters; a three-stage pipeline is sufficient.
     - style: microservices
       reason: A single-machine classification pipeline has no deployment boundary worth splitting.
+design_system:
+  tokens: .portfolio/design-system/tokens.yaml
+  readme_components: [readme_header, benchmark_card, architecture_card, references_table]
+  diagram_required: true
 benchmark:
   primary_metric: accuracy
   unit: unit
