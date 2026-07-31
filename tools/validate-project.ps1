@@ -94,7 +94,17 @@ try {
     Invoke-Checked "python compile src" { python -m compileall -q (Join-Path $root "src") }
     if (Test-Path -LiteralPath (Join-Path $root "tests") -PathType Container) {
       Invoke-Checked "python compile tests" { python -m compileall -q (Join-Path $root "tests") }
-      Invoke-Checked "python unittest" { python -m unittest discover -s (Join-Path $root "tests") -v }
+      # Run the test runner the project actually declares. pytest-style tests use
+      # plain classes, so "unittest discover" collects nothing: that is silently a
+      # pass before Python 3.12 and an exit code 5 failure from 3.12 onwards.
+      $pyprojectPath = Join-Path $root "pyproject.toml"
+      $usesPytest = (Test-Path -LiteralPath $pyprojectPath -PathType Leaf) -and
+        ((Get-Content -Raw -LiteralPath $pyprojectPath) -match "\[tool\.pytest")
+      if ($usesPytest) {
+        Invoke-Checked "pytest" { python -m pytest (Join-Path $root "tests") -q }
+      } else {
+        Invoke-Checked "python unittest" { python -m unittest discover -s (Join-Path $root "tests") -v }
+      }
     }
     $env:PYTHONPATH = $previousPythonPath
   }
