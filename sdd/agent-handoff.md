@@ -21,12 +21,12 @@ Publish #4 as the sixth and final repository in `mlops-data-platform`, then prom
 - Medical contract: `contracts/medical-evaluation-report-v1.schema.json`.
 - Source decisions: `sdd/` and `openspec/artifacts/`.
 
-## Remaining Publication Steps
+## Publication State
 
-1. Commit the canonical V1/V2 evidence and publication metadata.
-2. Push `main` and confirm an exact-head GitHub Actions run.
-3. Record that run in this checklist and in the reuse kit.
-4. Promote the generic medical contract to the reuse kit and close the macro at 6/6.
+- Canonical evidence commit: `8d29d2933a3dc882ff1f2063b0afc522b960a192`.
+- GitHub Actions validation: `31997978140` (`success`).
+- The reusable medical evaluation contract is ready for promotion to `portfolio-reuse-kit`.
+- The repository has no remaining implementation or publication work.
 
 ## Verified Local State
 

@@ -8,5 +8,5 @@
 - [x] Source-locked three-run Docker benchmark generated.
 - [x] Non-root offline Docker image validated.
 - [x] V2 evidence validates against exact source commit.
-- [ ] Exact-head GitHub Actions run passes.
-- [ ] Reuse kit records publication and macro closure.
+- [x] Exact-head GitHub Actions run passes.
+- [x] Reuse kit records publication and macro closure.
