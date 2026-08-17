@@ -79,7 +79,8 @@ def main() -> None:
             f"invalid {field}",
         )
     require(
-        "result_path: benchmarks/publication/stroke-signal-v2.json" in manifest,
+        "publication_result_path: benchmarks/publication/stroke-signal-v2.json"
+        in manifest,
         "project manifest does not point to V2 evidence",
     )
     serialized = json.dumps({"v1": v1, "v2": v2})

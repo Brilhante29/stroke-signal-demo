@@ -8,7 +8,7 @@ program:
     - medical evaluation report v1
     - immutable model and fixture digests
     - benchmark result v2
-status: implemented
+status: published
 claim: "One offline Docker command demonstrates a leakage-safe, paper-inspired hemorrhagic-stroke CT segmentation evaluation on deterministic synthetic phantoms without presenting synthetic scores as clinical reproduction."
 stack:
   - python-3.12
@@ -135,9 +135,12 @@ benchmark:
   command: "docker run --rm --network none stroke-signal-demo"
   result_path: benchmarks/results/baseline.json
   publication_result_path: benchmarks/publication/stroke-signal-v2.json
-  evidence_status: pending
+  evidence_status: current
 release:
   docker: "docker run --rm --network none stroke-signal-demo"
   no_secret_default_path: true
   readme_has_number: true
   references_documented: true
+  evidence_source_commit: ed1c8aee181b195d4aceeba9d08221486ee6b6ba
+  evidence_image_digest: sha256:0127593111e44059f0bc358f3eb629ab563ff550faac2765375def485b39f89d
+  evidence_image_size_bytes: 438442627

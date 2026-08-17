@@ -1,0 +1,153 @@
+{
+  "benchmark_id": "synthetic-stroke-ct-segmentation-v1",
+  "comparability_key": "stroke-signal-demo:synthetic-ct-v1:patient-split:quadrant-region-growth",
+  "environment": {
+    "architecture": "x86_64",
+    "container_platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "generated_dataset_sha256": "sha256:bbc8e2d62b30620bbd58580bd93e189fc41841c4f54b0c91c4e065f4c3d612d8",
+    "hardware_class": "local-docker",
+    "model_artifact_sha256": "sha256:79c31aaf5ecc0707b618d729b114464c983e824de93ea2983316bc22c545836c",
+    "numpy": "2.5.1",
+    "runtime": "python-3.12.13",
+    "scipy": "1.18.0",
+    "split_unit": "patient",
+    "test_used_for_selection": false
+  },
+  "execution": {
+    "command": "./tools/benchmark.ps1 -Patients 30 -SlicesPerPatient 4 -ImageSize 96 -Seed 2023 -Repetitions 3",
+    "duration_seconds": 1.3033135509758722,
+    "exit_code": 0,
+    "repeat": 3,
+    "started_at": "2026-08-17T05:23:11.058879Z"
+  },
+  "metrics": [
+    {
+      "direction": "higher_is_better",
+      "failures": 0,
+      "name": "segmentation_dice",
+      "samples": [
+        0.9424706943192065,
+        0.9424706943192065,
+        0.9424706943192065
+      ],
+      "summary": {
+        "max": 0.9424706943192065,
+        "mean": 0.9424706943192064,
+        "median": 0.9424706943192065,
+        "min": 0.9424706943192065
+      },
+      "unit": "ratio",
+      "value": 0.9424706943192065
+    },
+    {
+      "direction": "higher_is_better",
+      "failures": 0,
+      "name": "sensitivity",
+      "samples": [
+        0.9047783933518005,
+        0.9047783933518005,
+        0.9047783933518005
+      ],
+      "summary": {
+        "max": 0.9047783933518005,
+        "mean": 0.9047783933518007,
+        "median": 0.9047783933518005,
+        "min": 0.9047783933518005
+      },
+      "unit": "ratio",
+      "value": 0.9047783933518005
+    },
+    {
+      "direction": "higher_is_better",
+      "failures": 0,
+      "name": "specificity",
+      "samples": [
+        0.9997984388170191,
+        0.9997984388170191,
+        0.9997984388170191
+      ],
+      "summary": {
+        "max": 0.9997984388170191,
+        "mean": 0.999798438817019,
+        "median": 0.9997984388170191,
+        "min": 0.9997984388170191
+      },
+      "unit": "ratio",
+      "value": 0.9997984388170191
+    },
+    {
+      "direction": "higher_is_better",
+      "failures": 0,
+      "name": "accuracy",
+      "samples": [
+        0.9985577618634259,
+        0.9985577618634259,
+        0.9985577618634259
+      ],
+      "summary": {
+        "max": 0.9985577618634259,
+        "mean": 0.9985577618634259,
+        "median": 0.9985577618634259,
+        "min": 0.9985577618634259
+      },
+      "unit": "ratio",
+      "value": 0.9985577618634259
+    },
+    {
+      "direction": "higher_is_better",
+      "failures": 0,
+      "name": "iou",
+      "samples": [
+        0.8912005457025921,
+        0.8912005457025921,
+        0.8912005457025921
+      ],
+      "summary": {
+        "max": 0.8912005457025921,
+        "mean": 0.8912005457025921,
+        "median": 0.8912005457025921,
+        "min": 0.8912005457025921
+      },
+      "unit": "ratio",
+      "value": 0.8912005457025921
+    },
+    {
+      "direction": "lower_is_better",
+      "failures": 0,
+      "name": "latency_p95_ms",
+      "samples": [
+        1.6834390560688917,
+        2.3432775014953218,
+        2.0992941012082156
+      ],
+      "summary": {
+        "max": 2.3432775014953218,
+        "mean": 2.042003552924143,
+        "median": 2.0992941012082156,
+        "min": 1.6834390560688917
+      },
+      "unit": "milliseconds",
+      "value": 2.0992941012082156
+    }
+  ],
+  "project": "stroke-signal-demo",
+  "provenance": {
+    "artifact_digest": "sha256:a2a7dcbb412b4624b3ebaac975af34e653ef6871f05ef33e9e9078b65bc27e98",
+    "clean_tree": true,
+    "dependency_lock_digest": "sha256:c37a744fb4493b5b8f94faab1a7877e0ddf54a438d74f029c12ada3a009531e2",
+    "image_digest": "sha256:0127593111e44059f0bc358f3eb629ab563ff550faac2765375def485b39f89d",
+    "image_ref": "stroke-signal-demo:benchmark",
+    "producer": "local",
+    "source_commit": "ed1c8aee181b195d4aceeba9d08221486ee6b6ba"
+  },
+  "run_id": "172dd1ce-8a08-4fca-989e-c143d67a9957",
+  "schema_version": 2,
+  "workload": {
+    "concurrency": 1,
+    "config_digest": "sha256:a286a9d0810c9acdf6e01e7f575df3b362f7ae6adf9e1c6c8b1f0c39aa27dbdb",
+    "fixture_digest": "sha256:b8cad0aebe69ff833878faea7b726c5615969f37122dfa8b36c8b979dd1e0c9b",
+    "measured_iterations": 24,
+    "version": "synthetic-ct-patient-split-v1",
+    "warmup_iterations": 0
+  }
+}

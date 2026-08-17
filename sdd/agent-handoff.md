@@ -23,11 +23,17 @@ Publish #4 as the sixth and final repository in `mlops-data-platform`, then prom
 
 ## Remaining Publication Steps
 
-1. Commit the clean source implementation.
-2. Run `./tools/benchmark.ps1` against that commit.
-3. Commit canonical V1/V2 evidence and set `status: published`.
-4. Push `main`, confirm exact-head GitHub Actions, and record the run.
-5. Promote the generic medical contract to the reuse kit and close the macro at 6/6.
+1. Commit the canonical V1/V2 evidence and publication metadata.
+2. Push `main` and confirm an exact-head GitHub Actions run.
+3. Record that run in this checklist and in the reuse kit.
+4. Promote the generic medical contract to the reuse kit and close the macro at 6/6.
+
+## Verified Local State
+
+- Source commit: `ed1c8aee181b195d4aceeba9d08221486ee6b6ba`.
+- Three-run synthetic Dice: `0.9424706943192065`; failures: `0`.
+- Docker image: `sha256:0127593111e44059f0bc358f3eb629ab563ff550faac2765375def485b39f89d` (`438442627` bytes).
+- Test suite: `21` passing with more than `97%` line coverage.
 
 ## Open Risk
 

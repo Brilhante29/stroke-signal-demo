@@ -1,0 +1,182 @@
+{
+  "command": "stroke-signal-demo benchmark --patients 30 --slices-per-patient 4 --image-size 96 --seed 2023",
+  "dataset": {
+    "clinical_use": false,
+    "generated_dataset_sha256": "sha256:bbc8e2d62b30620bbd58580bd93e189fc41841c4f54b0c91c4e065f4c3d612d8",
+    "image_size": [
+      96,
+      96
+    ],
+    "kind": "deterministic-synthetic-ct-phantom",
+    "manifest_sha256": "sha256:b8cad0aebe69ff833878faea7b726c5615969f37122dfa8b36c8b979dd1e0c9b",
+    "patient_count": 30,
+    "seed": 2023,
+    "slices_per_patient": 4
+  },
+  "environment": {
+    "aggregated_runs": 3,
+    "duration_seconds": 0.43027325099683367,
+    "image_id": "sha256:0127593111e44059f0bc358f3eb629ab563ff550faac2765375def485b39f89d",
+    "machine": "x86_64",
+    "numpy": "2.5.1",
+    "platform": "Linux-6.18.33.2-microsoft-standard-WSL2-x86_64-with-glibc2.41",
+    "python": "3.12.13",
+    "scipy": "1.18.0"
+  },
+  "failures": 0,
+  "measured_iterations": 24,
+  "metric": "segmentation_dice",
+  "metrics": {
+    "accuracy": 0.9985577618634259,
+    "false_negative": 275,
+    "false_positive": 44,
+    "iou": 0.8912005457025921,
+    "latency_p50_ms": 1.6910935009946115,
+    "latency_p95_ms": 2.0992941012082156,
+    "segmentation_dice": 0.9424706943192065,
+    "sensitivity": 0.9047783933518005,
+    "specificity": 0.9997984388170191,
+    "test_positive_pixels": 2888,
+    "test_slices": 24,
+    "true_negative": 218252,
+    "true_positive": 2613
+  },
+  "model": {
+    "artifact_sha256": "sha256:79c31aaf5ecc0707b618d729b114464c983e824de93ea2983316bc22c545836c",
+    "calibration_threshold": 49.20638084411621,
+    "minimum_component_pixels": 12,
+    "name": "quadrant-seeded-adaptive-region-growth",
+    "stopping_threshold": 49.20638084411621
+  },
+  "project": "stroke-signal-demo",
+  "proof": {
+    "aggregate": "median with every raw sample preserved",
+    "benchmark_signature": {
+      "generated_dataset_sha256": "sha256:bbc8e2d62b30620bbd58580bd93e189fc41841c4f54b0c91c4e065f4c3d612d8",
+      "image_size": 96,
+      "model_artifact_sha256": "sha256:79c31aaf5ecc0707b618d729b114464c983e824de93ea2983316bc22c545836c",
+      "patient_count": 30,
+      "seed": 2023,
+      "slices_per_patient": 4,
+      "test_slices": 24,
+      "threshold_offsets": [
+        -6.0,
+        -3.0,
+        0.0,
+        3.0,
+        6.0
+      ]
+    },
+    "limitations": [
+      "synthetic CT phantoms are not the private 25-exam clinical dataset",
+      "the Detectron2 R50-FPN detector and clinical weights are not reproduced",
+      "results do not establish diagnostic or medical-device performance"
+    ],
+    "paper_doi": "10.1109/IJCNN54540.2023.10191320",
+    "published_stroke_metrics": {
+      "accuracy": 0.998,
+      "dice": 0.9325,
+      "sensitivity": 0.9982,
+      "specificity": 0.9981
+    },
+    "raw_results": [
+      "run-1.json",
+      "run-2.json",
+      "run-3.json"
+    ],
+    "scope": "paper-inspired synthetic methodology reconstruction"
+  },
+  "repeat": 3,
+  "results": [
+    "run-1.json",
+    "run-2.json",
+    "run-3.json"
+  ],
+  "samples": [
+    0.9424706943192065,
+    0.9424706943192065,
+    0.9424706943192065
+  ],
+  "samples_by_metric": {
+    "accuracy": [
+      0.9985577618634259,
+      0.9985577618634259,
+      0.9985577618634259
+    ],
+    "iou": [
+      0.8912005457025921,
+      0.8912005457025921,
+      0.8912005457025921
+    ],
+    "latency_p50_ms": [
+      1.4626815027440898,
+      1.6910935009946115,
+      1.7267864968744107
+    ],
+    "latency_p95_ms": [
+      1.6834390560688917,
+      2.3432775014953218,
+      2.0992941012082156
+    ],
+    "segmentation_dice": [
+      0.9424706943192065,
+      0.9424706943192065,
+      0.9424706943192065
+    ],
+    "sensitivity": [
+      0.9047783933518005,
+      0.9047783933518005,
+      0.9047783933518005
+    ],
+    "specificity": [
+      0.9997984388170191,
+      0.9997984388170191,
+      0.9997984388170191
+    ]
+  },
+  "schema_version": 1,
+  "split": {
+    "overlap_count": 0,
+    "test_patient_ids": [
+      "patient-003",
+      "patient-004",
+      "patient-005",
+      "patient-021",
+      "patient-027",
+      "patient-028"
+    ],
+    "test_used_for_selection": false,
+    "train_patient_ids": [
+      "patient-000",
+      "patient-001",
+      "patient-006",
+      "patient-008",
+      "patient-009",
+      "patient-011",
+      "patient-012",
+      "patient-013",
+      "patient-014",
+      "patient-015",
+      "patient-017",
+      "patient-018",
+      "patient-020",
+      "patient-022",
+      "patient-023",
+      "patient-024",
+      "patient-025",
+      "patient-026"
+    ],
+    "unit": "patient",
+    "validation_patient_ids": [
+      "patient-002",
+      "patient-007",
+      "patient-010",
+      "patient-016",
+      "patient-019",
+      "patient-029"
+    ]
+  },
+  "timestamp": "2026-08-17T05:23:17.336788Z",
+  "unit": "ratio",
+  "value": 0.9424706943192065
+}
