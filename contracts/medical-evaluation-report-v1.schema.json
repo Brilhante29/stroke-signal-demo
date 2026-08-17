@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://portfolio.local/contracts/medical-evaluation-report-v1.schema.json",
+  "title": "Medical evaluation report v1",
+  "type": "object",
+  "required": [
+    "schema_version", "project", "metric", "value", "unit", "timestamp", "command",
+    "repeat", "measured_iterations", "samples", "metrics", "dataset", "split", "model",
+    "environment", "proof", "failures"
+  ],
+  "properties": {
+    "schema_version": {"const": 1},
+    "project": {"const": "stroke-signal-demo"},
+    "metric": {"const": "segmentation_dice"},
+    "value": {"type": "number", "minimum": 0, "maximum": 1},
+    "unit": {"const": "ratio"},
+    "timestamp": {"type": "string", "format": "date-time"},
+    "command": {"type": "string", "minLength": 1},
+    "repeat": {"type": "integer", "minimum": 1},
+    "measured_iterations": {"type": "integer", "minimum": 1},
+    "samples": {"type": "array", "minItems": 1, "items": {"type": "number"}},
+    "metrics": {
+      "type": "object",
+      "required": [
+        "accuracy", "sensitivity", "specificity", "segmentation_dice", "iou",
+        "true_negative", "false_positive", "false_negative", "true_positive",
+        "latency_p50_ms", "latency_p95_ms", "test_slices", "test_positive_pixels"
+      ]
+    },
+    "dataset": {
+      "type": "object",
+      "required": ["kind", "clinical_use", "patient_count", "generated_dataset_sha256", "manifest_sha256"]
+    },
+    "split": {
+      "type": "object",
+      "required": [
+        "unit", "train_patient_ids", "validation_patient_ids", "test_patient_ids",
+        "overlap_count", "test_used_for_selection"
+      ],
+      "properties": {
+        "unit": {"const": "patient"},
+        "overlap_count": {"const": 0},
+        "test_used_for_selection": {"const": false}
+      }
+    },
+    "model": {"type": "object", "required": ["name", "stopping_threshold", "artifact_sha256"]},
+    "environment": {"type": "object"},
+    "proof": {"type": "object", "required": ["paper_doi", "scope", "limitations", "benchmark_signature"]},
+    "failures": {"const": 0}
+  }
+}

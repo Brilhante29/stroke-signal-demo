@@ -3,6 +3,12 @@ __pycache__/
 .ruff_cache/
 .venv/
 benchmarks/results/*.json
+!benchmarks/results/baseline.json
+!benchmarks/results/.gitkeep
+benchmarks/results/run-*.json
 dist/
 target/
 build/
+*.egg-info/
+.coverage
+htmlcov/

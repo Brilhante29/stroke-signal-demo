@@ -2,97 +2,36 @@
 
 ## Status
 
-Accepted
+Accepted.
 
-## Decision Type
+## Stack
 
-stack, library, runtime
+- Python 3.12.13 for the scientific CLI.
+- NumPy 2.5.1 for deterministic arrays and fixtures.
+- SciPy 1.18.0 for reviewed morphology and connected-component operations.
+- Jsonschema 4.26.0 for V1 and V2 evidence validation.
+- Pytest, coverage, and Ruff for executable quality gates.
+- Multi-stage, digest-pinned, non-root Docker runtime.
 
-## Context
+## Method Boundary
 
-Project: `4 - stroke-signal-demo`
-Problem: Reproduzir classificador clinico de AVC com dados sinteticos deterministicos
-Portfolio program: mlops-data-platform
-Public signal: reproducao de benchmark ML em Docker
-Benchmark: accuracy, confusion_matrix
+The paper uses Detectron2 R50-FPN automatic detection followed by Divisible Cell-Segmentation on a private clinical dataset. This repository reconstructs only the inspectable concepts needed for an offline methodological demonstration: recursive quadrant seed search and threshold-bounded region growth.
 
-## Selected Option
+The old RandomForest risk classifier was rejected because it solved tabular risk prediction rather than CT lesion segmentation. Full Detectron2 was rejected because neither the paper's training data nor weights are distributed here; adding it would create a large image without producing faithful evidence.
 
-Selected: scikit-learn RandomForest + synthetic fixture
+## Protocol
 
-Reason:
+1. Generate versioned synthetic patients and slices.
+2. Split by patient, never by slice.
+3. Fit intensity calibration on training labels only.
+4. Select the stopping threshold on validation patients only.
+5. Evaluate once on test patients and derive every metric from one confusion matrix.
+6. Bind three runs to exact source, image, wheel, lock, fixture, split, and model digests.
 
-Tabular classification com ~5% de taxa positiva, 7 features numericas/binarias e benchmark de accuracy e matriz de confusao. RandomForest oferece bom desempenho sem GPU, convergencia deterministica com seed fixa, e `class_weight="balanced"` para dados desbalanceados.
+## Operational Decisions
 
-## Decision Brain Fields
-
-- Stack profile: python-ml
-- API style: cli
-- Messaging: none
-- Cloud mode: none
-- Database/runtime: none (synthetic data in memory)
-- Library policy: scikit-learn para classificacao e metricas; pandas para geracao de fixture; argparse para CLI
-
-## Engineering Principles
-
-Coupling boundary:
-
-Domain types (BenchmarkResult) depend only on standard library. Model imports scikit-learn and pandas. CLI imports argparse.
-
-SOLID application:
-
-- SRP: fixture generation, model training, and benchmark output are separate modules.
-- OCP: new classifiers can be added without modifying existing evaluation code.
-- LSP: fixture output (DataFrame) is substitutable for any compatible dataset shape.
-- ISP: CLI depends on small function signatures (run_benchmark, generate_dataset, train_and_evaluate).
-- DIP: benchmark orchestrates high-level functions, not class hierarchies.
-
-Simplicity:
-
-- KISS: one classifier, one fixture, one JSON output.
-- YAGNI: no model serving, no experiment tracking, no hyperparameter optimization.
-- DRY: evaluation metrics computed once by scikit-learn, recorded by benchmark module.
-
-Testability evidence:
-
-- Domain types test BenchmarkResult construction and JSON roundtrip.
-- Model tests verify deterministic repeatability and accuracy above baseline.
-- No network, database, or cloud dependency required for any test.
-
-## Rejected Options
-
-| Option | Why rejected |
-|---|---|
-| PyTorch classifier | Overkill for tabular data; GPU not available in default Docker path; scikit-learn is simpler and equally effective |
-| Real medical dataset | Introduces network dependency and licensing risk; synthetic fixture is deterministic and reproducible |
-| FastAPI serving endpoint | No UI or API requirement in the claim; CLI is sufficient for benchmark execution |
-
-## API Contract
-
-Contract artifact: CLI argparse (`demo`, `benchmark` subcommands)
-
-## Cloud Local-First
-
-Local provider: none
-Real provider target: none
-Config switch: none
-
-## Benchmark Impact
-
-Expected impact: accuracy >= 0.95 with 5000 synthetic samples, seed 42
-
-Validation command:
-
-```powershell
-stroke-signal-demo benchmark --n-samples 5000 --seed 42 --output benchmarks/results/validation.json
-```
-
-## Operational Cost
-
-- Docker services added: none
-- Local demo complexity: low
-- Failure case required: no
-
-## Follow-up
-
-- N/A
+- CLI, not HTTP or GraphQL: output is an evaluation artifact.
+- No messaging: there is no asynchronous delivery requirement.
+- No database: all workload state is bounded and immutable.
+- No Kumo/cloud: no AWS behavior participates in the proof.
+- No MLflow/Airflow: #21 already owns lifecycle orchestration; duplicating it would weaken macro boundaries.

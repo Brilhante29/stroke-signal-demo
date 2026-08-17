@@ -1,70 +1,31 @@
 # Spec: stroke-signal-demo
 
-## Number
+## Intent
 
-#4
+Project #4 must demonstrate a leakage-safe hemorrhagic-stroke CT segmentation evaluation inspired by Divisible Cell-Segmentation. It must not claim to reproduce private clinical data, Detectron2 weights, or diagnostic performance.
 
-## Claim
+## In Scope
 
-Este projeto prova que: reproducao de classificador clinico com dados sinteticos deterministicos, sem dependencia de dados reais ou infraestrutura externa.
+- Deterministic synthetic CT phantoms with patient and slice identity.
+- Patient-level train, validation, and test isolation.
+- Train-only calibration and validation-only threshold selection.
+- Quadrant seed initialization and threshold-bounded connected-region growth.
+- Untouched test Dice, sensitivity, specificity, accuracy, IoU, confusion matrix, and latency.
+- Source, image, wheel, lock, fixture, split, and model identity in V2 evidence.
+- Offline non-root Docker execution.
 
-## Stack
+## Out Of Scope
 
-python, pandas, scikit-learn, matplotlib, docker
+- Clinical diagnosis, safety, generalization, fairness, calibration, or medical-device claims.
+- Redistribution of the paper's 25 examinations or any other patient data.
+- Full Detectron2 R50-FPN training without authorized data and paper weights.
+- API serving, UI, database, broker, orchestration, Kumo, or real cloud.
 
-## User-visible output
+## Acceptance
 
-- Docker command: `docker run --rm stroke-signal-demo`
-- README opens with: `# #4 stroke-signal-demo`
-- Benchmark table: accuracy, precision, recall, f1, confusion_matrix
-
-## Scope
-
-In:
-
-- Implementar o menor produto funcional que prove o claim.
-- Gerar dados sinteticos deterministicos que mimetizam features clinicas de AVC.
-- Treinar classificador RandomForest com dados sinteticos.
-- Reportar accuracy, precision, recall, f1 e matriz de confusao como JSON.
-- Rodar por Docker.
-- Gerar benchmark JSON reproduzivel.
-
-Out:
-
-- Publicar repo antes do primeiro resultado numerico.
-- Depender de dados reais de pacientes.
-- Depender de segredo pago para o caminho default.
-- GPU ou deep learning.
-- API de servico ou endpoint HTTP.
-
-## Architecture
-
-```
-fixture (synthetic data) -> model (train + evaluate) -> benchmark (JSON output)
-cli -> orchestrates pipeline
-```
-
-## Benchmark
-
-Primary metric:
-
-- name: accuracy
-- target: first reproducible baseline >= 0.95
-- command: `stroke-signal-demo benchmark --n-samples 5000 --seed 42 --output benchmarks/results/baseline.json`
-- result file: `benchmarks/results/baseline.json`
-
-## Dataset or fixture
-
-- source: synthetic (src/stroke_signal/fixture.py)
-- size: 5000 samples (configurable via --n-samples)
-- license: project-specific (no external data)
-- deterministic seed: 42
-
-## Definition of done
-
-- [x] Docker command works from clean clone.
-- [x] README starts with project number and benchmark result.
-- [x] Benchmark command writes JSON result.
-- [x] Tests cover core behavior.
-- [x] REFERENCES.md explains reuse.
-- [x] No secret or paid credential required for default demo.
+- `docker run --rm --network none stroke-signal-demo` completes without secrets.
+- No patient ID appears in more than one split.
+- Test IDs do not participate in calibration or threshold selection.
+- Confusion counts cover every test pixel and exactly derive all reported metrics.
+- Three raw runs from one immutable image produce a source-locked V2 artifact.
+- README opens with #4, measured synthetic numbers, paper attribution, and limitations.

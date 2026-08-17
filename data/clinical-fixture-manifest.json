@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "dataset_id": "synthetic-hemorrhagic-stroke-ct-v1",
+  "kind": "deterministic-synthetic-ct-phantom",
+  "generator": "stroke_signal.fixture.generate_fixture",
+  "patients": 30,
+  "slices_per_patient": 4,
+  "image_size": [96, 96],
+  "seed": 2023,
+  "split_unit": "patient",
+  "redistribution": "generated locally; no patient data included",
+  "clinical_use": false,
+  "source_dataset_available": false,
+  "source_dataset_reason": "The paper used a private 25-exam clinical dataset that is not redistributed by this repository."
+}

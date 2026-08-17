@@ -1,147 +1,93 @@
-param(
-  [switch]$SkipDocker
-)
+param([switch]$SkipDocker)
 
 $ErrorActionPreference = "Stop"
-
 $root = Split-Path -Parent $PSScriptRoot
 $failures = New-Object System.Collections.Generic.List[string]
 
-function Add-Failure {
-  param([string]$Message)
-  $script:failures.Add($Message)
-}
-
+function Add-Failure { param([string]$Message) $script:failures.Add($Message) }
 function Require-File {
   param([string]$RelativePath)
-  $path = Join-Path $root $RelativePath
-  if (-not (Test-Path -LiteralPath $path -PathType Leaf)) {
+  if (-not (Test-Path -LiteralPath (Join-Path $root $RelativePath) -PathType Leaf)) {
     Add-Failure "Missing file: $RelativePath"
   }
 }
-
 function Invoke-Checked {
-  param(
-    [string]$Label,
-    [scriptblock]$Command
-  )
+  param([string]$Label, [scriptblock]$Command)
   & $Command
-  $exitCode = $LASTEXITCODE
-  if ($exitCode -ne 0) {
-    Add-Failure "$Label failed with exit code $exitCode"
-  }
+  if ($LASTEXITCODE -ne 0) { Add-Failure "$Label failed with exit code $LASTEXITCODE" }
   $global:LASTEXITCODE = 0
 }
 
 $requiredFiles = @(
-  "README.md",
-  "project.yaml",
-  "REFERENCES.md",
-  "AGENTS.md",
-  "sdd/spec.md",
-  "sdd/benchmark-plan.md",
-  "sdd/architecture-decision.md",
-  "sdd/technical-decision.md",
-  "sdd/agent-handoff.md",
-  "sdd/reuse-improvement-review.md"
+  "README.md", "REFERENCES.md", "project.yaml", "Dockerfile", "constraints.lock",
+  "data/clinical-fixture-manifest.json", "data/LICENSE.md",
+  "contracts/medical-evaluation-report-v1.schema.json",
+  "benchmarks/workload.json", "benchmarks/results/baseline.json",
+  "sdd/spec.md", "sdd/benchmark-plan.md", "sdd/architecture-decision.md",
+  "sdd/technical-decision.md", "sdd/agent-handoff.md", "sdd/reuse-improvement-review.md"
 )
 foreach ($file in $requiredFiles) { Require-File $file }
 
-$reuseReviewPath = Join-Path $root "sdd/reuse-improvement-review.md"
-if (Test-Path -LiteralPath $reuseReviewPath -PathType Leaf) {
-  $reuseReview = Get-Content -Raw -LiteralPath $reuseReviewPath
-  if ($reuseReview -match "<id>|<project-name>") {
-    Add-Failure "Reuse improvement review still contains template placeholders"
-  }
-  if ($reuseReview.Contains('|  | `patch_now|backlog|reject` |')) {
-    Add-Failure "Reuse improvement review still contains the blank template finding row"
-  }
-  $requiredFinalGatePatterns = @(
+$manifestPath = Join-Path $root "project.yaml"
+$manifest = if (Test-Path -LiteralPath $manifestPath) { Get-Content -Raw -LiteralPath $manifestPath } else { "" }
+if ($manifest -match "(?m)^status:\s*published\s*$") {
+  Require-File "benchmarks/publication/stroke-signal-v2.json"
+}
+
+$reusePath = Join-Path $root "sdd/reuse-improvement-review.md"
+if (Test-Path -LiteralPath $reusePath) {
+  $reuse = Get-Content -Raw -LiteralPath $reusePath
+  foreach ($pattern in @(
     "(?m)^- \[x\] Reusable improvements were patched or recorded\.\r?$",
     "(?m)^- \[x\] Project-specific implementation was not moved into the kit\.\r?$",
     "(?m)^- \[x\] Validation reflects .+\.\r?$"
-  )
-  foreach ($pattern in $requiredFinalGatePatterns) {
-    if ($reuseReview -notmatch $pattern) {
-      Add-Failure "Reuse improvement review final gate is incomplete: $pattern"
-    }
+  )) {
+    if ($reuse -notmatch $pattern) { Add-Failure "Incomplete reuse review gate: $pattern" }
   }
-}
-
-$benchmarkFiles = @()
-$benchmarkDir = Join-Path $root "benchmarks/results"
-if (Test-Path -LiteralPath $benchmarkDir -PathType Container) {
-  $benchmarkFiles = @(Get-ChildItem -LiteralPath $benchmarkDir -Filter *.json -File)
-}
-if ($benchmarkFiles.Count -eq 0) {
-  Add-Failure "Missing benchmark JSON under benchmarks/results"
 }
 
 Push-Location -LiteralPath $root
 try {
-  foreach ($file in $benchmarkFiles) {
-    Invoke-Checked "benchmark JSON validation: $($file.Name)" { python -m json.tool $file.FullName | Out-Null }
+  $jsonFiles = @(Get-ChildItem benchmarks,data,contracts -Recurse -Filter *.json -File -ErrorAction SilentlyContinue)
+  foreach ($file in $jsonFiles) {
+    Invoke-Checked "JSON validation: $($file.Name)" { python -m json.tool $file.FullName | Out-Null }
   }
-
-  if (Test-Path -LiteralPath (Join-Path $root "src") -PathType Container) {
-    $previousPythonPath = $env:PYTHONPATH
-    $srcPath = Join-Path $root "src"
-    if ($previousPythonPath) {
-      $env:PYTHONPATH = $srcPath + [System.IO.Path]::PathSeparator + $previousPythonPath
-    } else {
-      $env:PYTHONPATH = $srcPath
-    }
-    Invoke-Checked "python compile src" { python -m compileall -q (Join-Path $root "src") }
-    if (Test-Path -LiteralPath (Join-Path $root "tests") -PathType Container) {
-      Invoke-Checked "python compile tests" { python -m compileall -q (Join-Path $root "tests") }
-      # Run the test runner the project actually declares. pytest-style tests use
-      # plain classes, so "unittest discover" collects nothing: that is silently a
-      # pass before Python 3.12 and an exit code 5 failure from 3.12 onwards.
-      $pyprojectPath = Join-Path $root "pyproject.toml"
-      $usesPytest = (Test-Path -LiteralPath $pyprojectPath -PathType Leaf) -and
-        ((Get-Content -Raw -LiteralPath $pyprojectPath) -match "\[tool\.pytest")
-      if ($usesPytest) {
-        Invoke-Checked "pytest" { python -m pytest (Join-Path $root "tests") -q }
-      } else {
-        Invoke-Checked "python unittest" { python -m unittest discover -s (Join-Path $root "tests") -v }
-      }
-    }
-    $env:PYTHONPATH = $previousPythonPath
+  $previousPythonPath = $env:PYTHONPATH
+  $env:PYTHONPATH = Join-Path $root "src"
+  Invoke-Checked "Python compile" { python -m compileall -q src tests tools }
+  Invoke-Checked "Ruff" { python -m ruff check src tests tools }
+  Invoke-Checked "pytest coverage" {
+    python -m pytest --cov=stroke_signal --cov-report=term-missing --cov-fail-under=90
   }
+  if (Test-Path -LiteralPath (Join-Path $root "benchmarks/results/baseline.json")) {
+    Invoke-Checked "benchmark contract" { python tools/validate-benchmark.py }
+    Invoke-Checked "publication evidence" { python tools/validate-publication.py }
+  }
+  $env:PYTHONPATH = $previousPythonPath
 } finally {
   Pop-Location
 }
 
-$legacy = ("ro" + "che" + "do")
-$patterns = @($legacy, ($legacy.Substring(0,1).ToUpper() + $legacy.Substring(1)))
+$legacy = "ro" + "che" + "do"
 $searchFiles = Get-ChildItem -Path $root -Recurse -File | Where-Object {
   $normalized = $_.FullName -replace "\\", "/"
-  $normalized -notmatch "/.git/" -and
-  $normalized -notmatch "/data/runtime/" -and
-  $_.Extension -in @(".md", ".yaml", ".yml", ".json", ".ps1", ".py", ".js", ".ts", ".tsx", ".go", ".kt", ".java")
+  $normalized -notmatch "/.git/" -and $normalized -notmatch "/.venv/" -and
+  $_.Extension -in @(".md", ".yaml", ".yml", ".json", ".ps1", ".py", ".ts", ".go", ".kt", ".java")
 }
-$forbidden = Select-String -Path $searchFiles.FullName -Pattern $patterns -SimpleMatch -ErrorAction SilentlyContinue
-if ($forbidden) {
-  Add-Failure "Forbidden legacy project nickname found"
-}
+$forbidden = Select-String -Path $searchFiles.FullName -Pattern @($legacy, (Get-Culture).TextInfo.ToTitleCase($legacy)) -SimpleMatch -ErrorAction SilentlyContinue
+if ($forbidden) { Add-Failure "Forbidden legacy project nickname found" }
 
-if (-not $SkipDocker -and (Test-Path -LiteralPath (Join-Path $root "Dockerfile") -PathType Leaf)) {
-  $imageName = (Split-Path -Leaf $root).ToLowerInvariant()
-  Invoke-Checked "docker build" { docker build -t $imageName $root | Out-Null }
+if (-not $SkipDocker) {
+  Invoke-Checked "Docker build" { docker build -t stroke-signal-demo $root | Out-Null }
+  Invoke-Checked "Docker default run" { docker run --rm --network none stroke-signal-demo | Out-Null }
 }
 
 if ($failures.Count -gt 0) {
-  # Write-Error is a terminating error while $ErrorActionPreference is "Stop",
-  # so emitting the list through it aborts on the first entry and hides every
-  # remaining failure. Report the complete list on the success stream instead.
   Write-Host "portfolio project validation failed with $($failures.Count) issue(s):"
   foreach ($failure in $failures) {
     Write-Host "  - $failure"
-    if ($env:GITHUB_ACTIONS -eq "true") {
-      Write-Host "::error::$failure"
-    }
+    if ($env:GITHUB_ACTIONS -eq "true") { Write-Host "::error::$failure" }
   }
   exit 1
 }
-
 Write-Host "portfolio project validation passed"

@@ -2,22 +2,24 @@ id: 4
 name: stroke-signal-demo
 program:
   id: mlops-data-platform
-  narrative_fit: Reproduces a clinical stroke classifier with deterministic synthetic data, proving that ML reproducibility is achievable without real patient records.
+  narrative_fit: "Closes the model-evaluation stage with a medically bounded, patient-isolated segmentation protocol and immutable evidence that can consume validated clinical splits when authorized data becomes available."
   shared_assets:
-    - reproducible benchmark JSON schema
-    - synthetic medical fixture generator
-status: benchmarked
-claim: reproducao de classificador clinico
+    - patient-level split identity
+    - medical evaluation report v1
+    - immutable model and fixture digests
+    - benchmark result v2
+status: implemented
+claim: "One offline Docker command demonstrates a leakage-safe, paper-inspired hemorrhagic-stroke CT segmentation evaluation on deterministic synthetic phantoms without presenting synthetic scores as clinical reproduction."
 stack:
-  - python
-  - pandas
-  - scikit-learn
-  - matplotlib
+  - python-3.12
+  - numpy-2.5.1
+  - scipy-1.18.0
+  - jsonschema-4.26.0
   - docker
 language_profile:
-  primary: python-ml
+  primary: python
   secondary: []
-  reason: Python with scikit-learn is the standard for tabular ML classification benchmarks; pandas and numpy handle fixture generation efficiently.
+  reason: "Python supplies reproducible numerical imaging primitives while small typed modules keep evaluation policy independent from serving, orchestration, and cloud frameworks."
 decision_brain:
   agentic_spec:
     source: .portfolio/decision-brain/agentic-spec-governance.yaml
@@ -37,17 +39,19 @@ decision_brain:
   reuse_improvement_loop:
     source: .portfolio/decision-brain/reuse-improvement-loop.yaml
     review_path: sdd/reuse-improvement-review.md
-    current_status: recorded
+    current_status: medical-contract-candidate-recorded
   principles:
-    coupling_rule: domain types depend only on standard library; model training depends only on scikit-learn and pandas; CLI depends on argparse.
-    solid: [srp, ocp, lsp, isp, dip]
-    simplicity_rule: one synthetic fixture, one classifier pipeline, one JSON benchmark output prove the claim without external data or infrastructure.
-    testability_rule: domain and evaluation run with synthetic data; no network, database, or cloud dependency required.
+    coupling_rule: "Fixture, split, segmentation, metrics, benchmark, and CLI are separate modules; none imports transport, database, broker, cloud SDK, orchestration, or another repository."
+    solid: [srp, ocp, isp, dip]
+    simplicity_rule: "Use one deterministic CPU method and one evidence path; do not add deep learning, serving, cloud, or messaging until an authorized dataset and measured requirement justify them."
+    testability_rule: "Patient identity, threshold selection, confusion arithmetic, seed search, segmentation, serialization, CLI, and publication evidence are executable in local tests without network or secrets."
     rejected_overengineering:
-      - deep learning framework
-      - real patient data dependency
-      - GPU training
-      - model serving API
+      - Detectron2 without the paper dataset and weights
+      - FastAPI or GraphQL
+      - Airflow or MLflow duplication
+      - Kafka or RabbitMQ
+      - Kumo or real cloud
+      - microservices or Kubernetes
   stack_profile: python-ml
   api_style: cli
   messaging: none
@@ -56,51 +60,84 @@ decision_brain:
     local_provider: none
     real_provider_target: none
     emulated_services: []
-    adapter_rule: no cloud dependency; all data is synthetic and local
-    config_switch: none
-    unsupported_behaviors: []
+    adapter_rule: "No cloud behavior exists in the measured path; authorized object storage would be introduced behind a project-owned port and checked against Kumo before real AWS."
+    config_switch: not-applicable
+    unsupported_behaviors:
+      - clinical PACS integration
+      - hosted model registry
+      - managed inference
   database: none
-  runtime: Python CLI in a slim Docker image; scikit-learn RandomForest with deterministic seed.
-  library_policy: scikit-learn for classification and metrics; pandas for fixture generation; argparse for CLI; no other runtime dependencies.
+  runtime: "Single non-root Python 3.12.13 CPU container pinned by OCI digest; deterministic offline fixture and no paid credentials."
+  library_policy: "NumPy owns deterministic numerical fixtures, SciPy owns reviewed morphology and connected components, Jsonschema validates evidence, and standard-library dataclasses own contracts."
   record_path: sdd/technical-decision.md
   rejected_options:
-    - option: PyTorch classifier
-      reason: A linear or tree-based model is sufficient for tabular stroke prediction data; deep learning adds complexity without benchmark improvement.
-    - option: Real medical dataset download
-      reason: External datasets introduce reproducibility risk and network dependency; synthetic fixtures are deterministic and local.
+    - option: Full Detectron2 paper reproduction
+      reason: "The private 25-exam dataset, annotations, and trained weights are not distributed; claiming equivalent reproduction would be false."
+    - option: Tabular RandomForest stroke-risk classifier
+      reason: "It solves a different prediction problem and cannot support the cited CT segmentation paper."
+    - option: HTTP or GraphQL API
+      reason: "The claim is an offline evaluation artifact, not an online serving contract."
+    - option: Kafka, RabbitMQ, Kumo, or real cloud
+      reason: "No asynchronous or cloud behavior participates in the measured segmentation protocol."
 architecture:
   style: pipeline
-  reason: Data generation, model training, and evaluation form a natural three-stage pipeline from synthetic input to benchmark output.
+  reason: "The dominant force is ordered scientific evaluation: fixture identity, patient split, train calibration, validation selection, untouched test segmentation, metrics, and evidence."
   problem_forces:
-    domain_complexity: low
+    domain_complexity: medium
     integration_pressure: low
     ui_state_complexity: none
     data_or_ml_reproducibility: high
-    auditability: medium
+    auditability: high
     throughput_or_async: low
     independent_deployability: low
-  dependency_rule: fixture depends only on numpy/pandas; model depends on scikit-learn and fixture types; CLI depends on both; benchmark orchestrates the pipeline.
+  dependency_rule: "The CLI depends on benchmark orchestration; orchestration depends on fixture, model, and domain values; no inward module depends on transport or infrastructure."
   boundaries:
-    - fixture owns synthetic data generation with deterministic seed
-    - model owns training and evaluation pipeline
-    - benchmark owns orchestration and JSON output
-    - cli owns command-line interface
+    - deterministic synthetic CT fixture and identity
+    - patient-isolated train, validation, and test assignment
+    - train calibration and validation-only model selection
+    - quadrant seed and connected-region segmentation
+    - pixel confusion and clinical evaluation metrics
+    - V1 and V2 benchmark evidence
+    - command-line transport
   rejected_alternatives:
-    - style: hexagonal
-      reason: There is no infrastructure or transport boundary to justify ports and adapters; a three-stage pipeline is sufficient.
+    - style: mvc
+      reason: "There is no UI state or request controller."
+    - style: hexagonal-as-primary
+      reason: "No external infrastructure adapter exists; ports would be speculative."
     - style: microservices
-      reason: A single-machine classification pipeline has no deployment boundary worth splitting.
+      reason: "A single scientific process has no independent deployment boundary."
 design_system:
   tokens: .portfolio/design-system/tokens.yaml
   readme_components: [readme_header, benchmark_card, architecture_card, references_table]
   diagram_required: true
+reuse:
+  kit_version: portfolio-reuse-kit@285939b
+  uses:
+    - catalog
+    - mlops-data-platform
+    - agentic-spec-governance
+    - medical-ai-evaluation
+    - benchmark-harness
+    - publish-benchmark-evidence
+    - python-computer-vision
+    - benchmark-result-v2
+    - design-system
+medical_evaluation:
+  positive_class: hemorrhage-pixel
+  split_unit: patient
+  test_used_for_selection: false
+  clinical_use: false
+  dataset_kind: deterministic-synthetic-ct-phantom
+  paper_doi: 10.1109/IJCNN54540.2023.10191320
 benchmark:
-  primary_metric: accuracy
-  unit: unit
-  command: "stroke-signal-demo benchmark --n-samples 5000 --seed 42 --output benchmarks/results/baseline.json"
+  primary_metric: segmentation_dice
+  unit: ratio
+  command: "docker run --rm --network none stroke-signal-demo"
   result_path: benchmarks/results/baseline.json
+  publication_result_path: benchmarks/publication/stroke-signal-v2.json
+  evidence_status: pending
 release:
-  docker: "docker run --rm stroke-signal-demo"
+  docker: "docker run --rm --network none stroke-signal-demo"
   no_secret_default_path: true
   readme_has_number: true
   references_documented: true

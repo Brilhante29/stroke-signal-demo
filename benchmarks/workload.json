@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "benchmark_id": "synthetic-stroke-ct-segmentation-v1",
+  "workload_version": "synthetic-ct-patient-split-v1",
+  "patient_count": 30,
+  "slices_per_patient": 4,
+  "image_size": 96,
+  "seed": 2023,
+  "threshold_offsets": [-6.0, -3.0, 0.0, 3.0, 6.0],
+  "train_patients": 18,
+  "validation_patients": 6,
+  "test_patients": 6,
+  "test_slices": 24,
+  "warmup_iterations": 0,
+  "repetitions": 3,
+  "concurrency": 1,
+  "paper_doi": "10.1109/IJCNN54540.2023.10191320",
+  "comparability_key": "stroke-signal-demo:synthetic-ct-v1:patient-split:quadrant-region-growth"
+}

@@ -1,45 +1,37 @@
-# Benchmark Plan: stroke-signal-demo
+# Benchmark Plan
 
 ## Hypothesis
 
-reproducao de classificador clinico, measured by accuracy, confusion_matrix.
+The repository can execute a deterministic, patient-isolated segmentation protocol and preserve enough evidence to detect leakage, metric inconsistency, workload drift, model drift, or artifact substitution.
 
-## Command
+## Workload
 
-```bash
-stroke-signal-demo benchmark --n-samples 5000 --seed 42 --output benchmarks/results/baseline.json
-```
-
-## Environment
-
-- OS: Linux (Docker container, python:3.12-slim)
-- CPU: 1+ cores
-- RAM: 256MB+
-- GPU: none
-- Docker version: any with Dockerfile support
-- Date: recorded in result JSON
-
-## Inputs
-
-- fixture: synthetic (src/stroke_signal/fixture.py)
-- dataset size: 5000 samples (configurable via --n-samples)
-- repetitions: 1 (configurable via --repeats)
-- warmup: none (deterministic pipeline)
+- 30 synthetic patients and 4 slices per patient.
+- 18 train, 6 validation, and 6 untouched test patients.
+- 96 x 96 pixels, seed 2023, CPU only.
+- Five validation threshold candidates around a train-derived calibration.
+- Three complete runs from one immutable Docker image.
 
 ## Metrics
 
-| Metric | Unit | Source | Why it matters |
-|---|---|---|---:|---|
-| accuracy | unit | sklearn.metrics.accuracy_score | primary classification quality |
-| precision | unit | sklearn.metrics.precision_score | false positive control |
-| recall | unit | sklearn.metrics.recall_score | false negative control |
-| f1_score | unit | sklearn.metrics.f1_score | balanced harmonic mean |
-| tn/fp/fn/tp | count | sklearn.metrics.confusion_matrix | full confusion matrix breakdown |
+| Metric | Unit | Direction | Purpose |
+|---|---|---|---|
+| segmentation Dice | ratio | higher | overlap quality without background dominance |
+| sensitivity | ratio | higher | false-negative control |
+| specificity | ratio | higher | false-positive control |
+| accuracy | ratio | higher | required context, interpreted with class imbalance |
+| IoU | ratio | higher | overlap comparison |
+| p95 slice latency | ms | lower | CPU execution cost |
+| TN / FP / FN / TP | pixels | n/a | auditable confusion matrix |
 
-## Result schema
+## Command
 
-Output must be JSON and include project, metric, value, unit, timestamp, environment, and command. See `domain.py` BenchmarkResult for the full schema.
+```powershell
+./tools/benchmark.ps1
+```
 
-## Post angle
+Raw runs are temporary. The committed outputs are `benchmarks/results/baseline.json` and `benchmarks/publication/stroke-signal-v2.json`.
 
-#4 stroke-signal-demo: accuracy=0.987 as a reproducible portfolio benchmark.
+## Interpretation
+
+Synthetic quality metrics are regression evidence for this generated workload. They are not comparable to clinical performance. Published paper metrics remain attribution-only and are never merged with repository measurements.

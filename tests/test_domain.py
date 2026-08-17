@@ -3,45 +3,59 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from stroke_signal.domain import BenchmarkResult
+import pytest
+
+from stroke_signal.domain import BenchmarkResult, PatientSplit, PixelMetrics
 
 
-class TestBenchmarkResult:
-    def test_from_metrics_builds_valid_result(self):
-        result = BenchmarkResult.from_metrics(
-            accuracy=0.85,
-            confusion_matrix=[[100, 10], [15, 75]],
-            precision=0.88,
-            recall=0.83,
-            f1=0.85,
-            n_samples=5000,
-            seed=42,
-            command="stroke-signal-demo benchmark --n-samples 5000",
-            output_path=Path("benchmarks/results/test.json"),
-        )
-        assert result.project == "4-stroke-signal-demo"
-        assert result.metric == "accuracy"
-        assert result.value == 0.85
-        assert result.metrics["accuracy"] == 0.85
-        assert result.metrics["tn"] == 100
-        assert result.metrics["tp"] == 75
-        assert result.failures == 0
+def test_patient_split_rejects_overlap() -> None:
+    split = PatientSplit(("a",), ("b",), ("a",))
+    with pytest.raises(ValueError, match="overlap"):
+        split.assert_isolated()
 
-    def test_to_json_roundtrip(self, tmp_path: Path):
-        path = tmp_path / "result.json"
-        result = BenchmarkResult.from_metrics(
-            accuracy=0.9,
-            confusion_matrix=[[50, 5], [8, 37]],
-            precision=0.9,
-            recall=0.9,
-            f1=0.9,
-            n_samples=1000,
-            seed=7,
-            command="test",
-            output_path=path,
-        )
-        result.to_json(path)
-        assert path.exists()
-        data = json.loads(path.read_text())
-        assert data["project"] == "4-stroke-signal-demo"
-        assert data["value"] == 0.9
+
+def test_patient_split_counts_isolated_patients() -> None:
+    split = PatientSplit(("a", "b"), ("c",), ("d",))
+    assert split.patient_count == 4
+
+
+def test_pixel_metrics_compute_clinical_values() -> None:
+    metrics = PixelMetrics(80, 20, 10, 90)
+    assert metrics.total == 200
+    assert metrics.accuracy == 0.85
+    assert metrics.sensitivity == 0.9
+    assert metrics.specificity == 0.8
+    assert metrics.dice == 0.8571428571428571
+    assert metrics.iou == 0.75
+    assert metrics.as_dict()["true_positive"] == 90
+
+
+def test_pixel_metrics_handle_empty_denominator_and_invalid_counts() -> None:
+    assert PixelMetrics(0, 0, 0, 0).accuracy == 0.0
+    with pytest.raises(ValueError, match="negative"):
+        PixelMetrics(-1, 0, 0, 0)
+
+
+def test_benchmark_result_serializes(tmp_path: Path) -> None:
+    output = tmp_path / "result.json"
+    result = BenchmarkResult(
+        1,
+        "stroke-signal-demo",
+        "segmentation_dice",
+        0.8,
+        "ratio",
+        "2026-01-01T00:00:00Z",
+        "benchmark",
+        1,
+        2,
+        [0.8],
+        {},
+        {},
+        {},
+        {},
+        {},
+        {},
+        0,
+    )
+    result.to_json(output)
+    assert json.loads(output.read_text(encoding="utf-8"))["value"] == 0.8
