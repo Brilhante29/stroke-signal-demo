@@ -1,4 +1,4 @@
-# #4 stroke-signal-demo
+# Reproducible Stroke CT Segmentation Benchmark
 
 **Measured synthetic baseline:** Dice `0.9425`, sensitivity `0.9048`, specificity `0.9998`, accuracy `0.9986`, and test confusion matrix `TN / FP / FN / TP = 218252 / 44 / 275 / 2613`.
 
